@@ -1,0 +1,843 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Déjanir | Rhizome Upcycling Fashion</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --accent: #a68a64;
+      --muted: #666666;
+      --border: #000000;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 40px;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .page.active {
+      display: block;
+      position: relative;
+      opacity: 1;
+    }
+
+    .fixed-logo {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      letter-spacing: -0.06rem;
+      font-weight: 700;
+      z-index: 10;
+    }
+
+    .nav-group {
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      z-index: 5;
+    }
+
+    .nav-group.top-left {
+      top: 24px;
+      left: 32px;
+    }
+
+    .nav-group.bottom-left {
+      bottom: 24px;
+      left: 32px;
+    }
+
+    .nav-group.top-right {
+      top: 24px;
+      right: 32px;
+      flex-direction: row;
+      gap: 12px;
+    }
+
+    .nav-item {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, color 0.2s ease;
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+    }
+
+    .nav-item:hover {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      opacity: 1;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    /* ========== HOME PAGE ========== */
+    .home {
+      background: url('https://source.unsplash.com/random/1920x1080/?vintage,fabric,wood,nature') center/cover no-repeat;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    .home::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.25);
+      mix-blend-mode: lighten;
+    }
+
+    .home-content {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 32px;
+      padding: 80px 72px;
+    }
+
+    .home-copy {
+      max-width: 420px;
+      line-height: 1.8;
+      letter-spacing: 0.02em;
+      font-size: 1rem;
+    }
+
+    .home-copy strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 22px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 600;
+    }
+
+    .home-copy h1 {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      line-height: 0.95;
+      margin-bottom: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .home-copy p {
+      color: var(--muted);
+      max-width: 360px;
+      line-height: 1.7;
+    }
+
+    .home-visual {
+      min-height: 380px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255,255,255,0.9);
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .home-visual span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    /* ========== SHOP PAGE ========== */
+    .shop-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 42px;
+      align-items: start;
+      padding-top: 120px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .shop-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      position: sticky;
+      top: 120px;
+    }
+
+    .shop-categories .cat-item {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, color 0.2s ease;
+      padding: 4px 0;
+    }
+
+    .shop-categories .cat-item:hover,
+    .shop-categories .cat-item.active {
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .product-item {
+      min-height: 320px;
+      background: #f8f8f8;
+      display: grid;
+      place-items: center;
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+    }
+
+    .product-label {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+
+    .product-item:hover .product-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .shop-intro {
+      margin-bottom: 40px;
+      letter-spacing: 0.08em;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ========== LOGIN PAGE ========== */
+    .login-panel,
+    .info-panel {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .form-shell {
+      width: min(420px, 100%);
+      padding: 52px 42px;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.98);
+    }
+
+    .form-shell h2 {
+      margin-bottom: 28px;
+      font-size: 1.8rem;
+      letter-spacing: -0.04rem;
+      font-weight: 700;
+    }
+
+    .input-group {
+      display: grid;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .label-field {
+      display: grid;
+      gap: 8px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .field-input {
+      border: none;
+      border-bottom: 2px solid rgba(0,0,0,0.2);
+      padding: 12px 0;
+      font-size: 1rem;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      transition: border-color 0.2s ease;
+    }
+
+    .field-input:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    .field-input::placeholder {
+      color: rgba(0,0,0,0.3);
+    }
+
+    .login-button {
+      display: inline-block;
+      margin-top: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.9rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 8px 0;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .login-button:hover {
+      color: var(--accent);
+    }
+
+    .social-buttons {
+      display: grid;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .social-button {
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .social-button:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .social-button.kakao {
+      background: #FEE500;
+      color: #000;
+      border-color: rgba(0,0,0,0.1);
+    }
+
+    .social-button.gmail {
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+    }
+
+    .tiny-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .tiny-links span {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .tiny-links span:hover {
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    /* ========== INFO PAGE ========== */
+    .info-shell {
+      width: min(520px, 100%);
+      padding: 52px 42px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      line-height: 2;
+      letter-spacing: 0.02em;
+    }
+
+    .info-shell h3 {
+      margin-bottom: 24px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .info-shell p {
+      font-size: 0.96rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .info-shell strong {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .info-shell .team {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+      font-size: 0.96rem;
+      color: var(--text);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .shop-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .shop-categories {
+        position: static;
+      }
+
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .home-content {
+        grid-template-columns: 1fr;
+        padding: 40px 24px;
+      }
+
+      .nav-group.top-left,
+      .nav-group.bottom-left {
+        left: 16px;
+      }
+
+      .nav-group.top-right {
+        right: 16px;
+      }
+
+      .nav-group {
+        gap: 12px;
+      }
+
+      .form-shell,
+      .info-shell {
+        padding: 32px 24px;
+        width: 100%;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shop-shell {
+        padding-top: 80px;
+        gap: 24px;
+      }
+
+      .fixed-logo {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 24px;
+      }
+
+      .home-copy h1 {
+        font-size: 2.5rem;
+      }
+
+      .home-visual {
+        min-height: 240px;
+      }
+
+      .nav-item,
+      .nav-group {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* ========== IMAGE UPLOAD STYLES ========== */
+    .image-upload-section {
+      margin-bottom: 32px;
+      padding: 24px;
+      border: 2px dashed rgba(0,0,0,0.2);
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .image-upload-section:hover {
+      border-color: var(--accent);
+      background: rgba(166, 138, 100, 0.05);
+    }
+
+    #image-input {
+      display: none;
+    }
+
+    .upload-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+
+    .upload-label span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .gallery-item {
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.08);
+      overflow: hidden;
+      aspect-ratio: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.02);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .gallery-item:hover .remove-image-btn {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="fixed-logo">Déjanir</div>
+
+  <!-- TOP LEFT NAVIGATION -->
+  <nav class="nav-group top-left">
+    <span class="nav-item active" data-page="shop" onclick="navigate(this)">SHOP</span>
+    <span class="nav-item" data-page="gallery" onclick="navigate(this)">GALLERY</span>
+    <span class="nav-item" data-page="collection" onclick="navigate(this)">COLLECTION</span>
+    <span class="nav-item" data-page="search" onclick="navigate(this)">SEARCH</span>
+  </nav>
+
+  <!-- BOTTOM LEFT NAVIGATION -->
+  <nav class="nav-group bottom-left">
+    <span class="nav-item" data-page="login" onclick="navigate(this)">LOGIN</span>
+    <span class="nav-item" data-page="info" onclick="navigate(this)">INFO</span>
+    <span class="nav-item" data-page="stockists" onclick="navigate(this)">STOCKISTS</span>
+  </nav>
+
+  <!-- TOP RIGHT NAVIGATION -->
+  <nav class="nav-group top-right">
+    <span class="nav-item" onclick="changeLang('en')">EN</span>
+    <span class="nav-item" onclick="changeLang('kr')">KR</span>
+  </nav>
+
+  <main>
+    <!-- HOME PAGE -->
+    <section id="home" class="page home">
+      <div class="home-content">
+        <div class="home-copy">
+          <strong>Rhizome Upcycling</strong>
+          <h1>Déjanir</h1>
+          <p>
+            A minimal fashion narrative built from deadstock textiles and natural
+            fibres. Structural simplicity meets intentional design. The brand moves
+            like a root network—quiet, connected, and sustainable.
+          </p>
+        </div>
+        <div class="home-visual">
+          <img src="https://source.unsplash.com/random/500x400/?vintage,fabric,textile" alt="Vintage Fabric" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOP PAGE -->
+    <section id="shop" class="page">
+      <div class="shop-shell">
+        <div class="shop-categories">
+          <div class="cat-item active">ALL</div>
+          <div class="cat-item">OUTER</div>
+          <div class="cat-item">TOP</div>
+          <div class="cat-item">BOTTOM</div>
+          <div class="cat-item">ACC</div>
+        </div>
+        <div>
+          <div class="shop-intro">Sustainable drift / Upcycled garments / Editorial edit</div>
+          <div class="product-grid">
+            <div class="product-item">
+              <img src="https://source.unsplash.com/random/400x500/?jacket,fashion,clothing" alt="Upcycled Jacket" />
+              <span class="product-label">Déjanir Upcycled Jacket<br/>KRW 150,000</span>
+            </div>
+            <div class="product-item">
+              <img src="https://source.unsplash.com/random/400x500/?knit,sweater,wool" alt="Reconstructed Knit" />
+              <span class="product-label">Déjanir Reconstructed Knit<br/>KRW 98,000</span>
+            </div>
+            <div class="product-item">
+              <img src="https://source.unsplash.com/random/400x500/?trousers,pants,denim" alt="Tailored Trousers" />
+              <span class="product-label">Déjanir Tailored Trousers<br/>KRW 132,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN PAGE -->
+    <section id="login" class="page">
+      <div class="login-panel">
+        <div class="form-shell">
+          <h2>Login</h2>
+          <div class="input-group">
+            <label class="label-field">
+              ID
+              <input type="text" class="field-input" placeholder="Enter your ID" />
+            </label>
+            <label class="label-field">
+              PASSWORD
+              <input type="password" class="field-input" placeholder="Enter your password" />
+            </label>
+          </div>
+          <button class="login-button">LOGIN →</button>
+          <div class="social-buttons">
+            <button class="social-button kakao">KAKAO LOGIN</button>
+            <button class="social-button gmail">GMAIL LOGIN</button>
+          </div>
+          <div class="tiny-links">
+            <span>FORGOT ID | PASSWORD</span>
+            <span>CREATE ACCOUNT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFO PAGE -->
+    <section id="info" class="page">
+      <div class="info-panel">
+        <div class="info-shell">
+          <h3>Studio & Team</h3>
+          <strong>CEO (Representative)</strong>
+          <p>Lim Jaemin</p>
+          <strong>Team Members</strong>
+          <div class="team">
+            <p>Park Sieon</p>
+            <p>Kim Yunyoung</p>
+            <p>Oh Yejeong</p>
+            <p>Kim Jungwoo</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY PAGE -->
+    <section id="gallery" class="page">
+      <div style="padding-top: 120px; max-width: 900px; margin: 0 auto;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 32px;">Gallery</h1>
+        <p style="color: var(--muted); margin-bottom: 42px; line-height: 1.8;">Curated editorial collection showcasing the intersection of sustainable upcycling and contemporary design.</p>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?fabric,textile,vintage" alt="Vintage Fabric" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?sustainable,fashion,eco" alt="Sustainable Fashion" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?upcycled,clothing,design" alt="Upcycled Design" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?nature,rhizome,roots" alt="Rhizome Network" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?wood,texture,organic" alt="Organic Texture" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://source.unsplash.com/random/400x400/?minimalist,fashion,style" alt="Minimalist Design" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLLECTION PAGE (Placeholder) -->
+    <section id="collection" class="page">
+      <div class="home-content" style="padding-top: 120px;">
+        <div class="home-copy">
+          <h1>Collection</h1>
+          <p>Each season's collection tells a story of transformation—deadstock textiles reimagined.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH PAGE (Placeholder) -->
+    <section id="search" class="page">
+      <div class="home-content" style="padding-top: 120px;">
+        <div class="home-copy">
+          <h1>Search</h1>
+          <input type="text" class="field-input" placeholder="Search products, collections, or articles" style="width: 100%; max-width: 500px; font-size: 1rem;" />
+        </div>
+      </div>
+    </section>
+
+    <!-- STOCKISTS PAGE (Placeholder) -->
+    <section id="stockists" class="page">
+      <div class="home-content" style="padding-top: 120px;">
+        <div class="home-copy">
+          <h1>Stockists</h1>
+          <p>Find Déjanir pieces at partner boutiques worldwide.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function navigate(element) {
+      const targetPage = element.getAttribute('data-page');
+      if (!targetPage) return;
+
+      // Hide all pages
+      document.querySelectorAll('.page').forEach((page) => {
+        page.classList.remove('active');
+      });
+
+      // Remove active from all nav items
+      document.querySelectorAll('.nav-item').forEach((item) => {
+        item.classList.remove('active');
+      });
+
+      // Show target page
+      const targetElement = document.getElementById(targetPage);
+      if (targetElement) {
+        targetElement.classList.add('active');
+      }
+
+      // Mark nav item as active
+      element.classList.add('active');
+    }
+
+    function changeLang(lang) {
+      console.log('Language changed to:', lang);
+      // Placeholder for language switching logic
+    }
+
+    // Initialize with home page on load
+    document.addEventListener('DOMContentLoaded', function () {
+      const shopNav = document.querySelector('[data-page="shop"]');
+      if (shopNav) {
+        navigate(shopNav);
+      }
+    });
+
+    // Prevent default button behavior
+    document.querySelectorAll('.social-button, .login-button').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Button clicked:', btn.textContent);
+      });
+    });
+  </script>
+</body>
+</html>
